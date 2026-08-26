@@ -8,18 +8,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Models
 {
-    [Index(nameof(Email), IsUnique = true)]
+    
     public class User
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
         [Required]
-        public string Email { get; set; }
+        public string Email { get; private set; }
         [Required]
-        public string Name { get; set; }
-        public int Idade { get; set; }
-        public DateTime CreationDate { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public string Name { get; private set; }
+        [Required]
+        public int Idade { get; private set; }
+        public DateTime CreationDate { private get; set; }
+        public DateTime UpdatedAt { get; private set; }
 
         public User(string email, string name, int idade)
         {
