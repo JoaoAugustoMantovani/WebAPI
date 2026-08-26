@@ -6,24 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.Data;
 using WebAPI.Models;
 using WebAPI.Repository;
+using WebAPI.Service;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        
-        public UsersController(IUserRepository userRepository)
+
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
         {
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
         [HttpPost]
         public async Task<IActionResult> AddUser(UserDTO request)
         {
-            var user = await _userRepository.CreateUser(new User(request.Email, request.Name, request.Idade));
+            var user = await _userService.CreateUser(request);
+            
+            if (user == null)
+            {
+                return BadRequest("Usuário não pode ser nulo");
+            }
             
             return Ok(user);
         }

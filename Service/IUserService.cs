@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Models;
 
-namespace WebAPI.Repository
+namespace WebAPI.Service
 {
-    public interface IUserRepository : IDisposable
+    public interface IUserService
     {
-        Task<User> CreateUser(User user);
+        Task<User> CreateUser(UserDTO user);
     }
 }

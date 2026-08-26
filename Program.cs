@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using WebAPI.Data;
 using WebAPI.Repository;
+using WebAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 
-builder.Services.AddScoped<IUserRepository, UsersRepository>();
-
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 #endregion
 
 var app = builder.Build();
