@@ -21,18 +21,14 @@ namespace WebAPI.Controllers
         {
             _userService = userService;
         }
-
+        
+        
         [HttpPost]
-        public async Task<IActionResult> AddUser(UserDTO request)
+        public async Task<IActionResult> AddUser([FromBody] UserDTO request)
         {
-            var user = await _userService.CreateUser(request);
+            var createdUser = await _userService.CreateUser(request);
             
-            if (user == null)
-            {
-                return BadRequest("Usuário não pode ser nulo");
-            }
-            
-            return Ok(user);
+            return CreatedAtAction(nameof(AddUser), new {id = createdUser.Id, name = createdUser.Name});
         }
 
     }
