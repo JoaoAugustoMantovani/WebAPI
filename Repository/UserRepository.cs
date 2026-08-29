@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Models;
@@ -10,8 +6,8 @@ namespace WebAPI.Repository
 {
     public class UserRepository : IUserRepository
     {
-
         private readonly AppDbContext _appDbContext;
+
         public UserRepository(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
@@ -19,19 +15,45 @@ namespace WebAPI.Repository
 
         public async Task<User> CreateUser(User user)
         {
+            _appDbContext.User.Add(user);
             try
             {
-            _appDbContext.User.Add(user);
-            await _appDbContext.SaveChangesAsync();
+                await _appDbContext.SaveChangesAsync();
             }
-            catch(DbUpdateException)
+            catch (DbUpdateException)
             {
                 throw new Exception("Erro ao salvar no banco");
             }
             return user;
         }
 
-        public void Dispose()
+        public async Task DeleteUser(User user)
+        {
+            _appDbContext.User.Remove(user);
+            await _appDbContext.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetUserById(Guid userId)
+        {
+            var user = await _appDbContext.User.FindAsync(userId);
+
+            return user;
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            var user = await _appDbContext.User.ToListAsync();
+
+            return user;
+        }
+
+        public async Task UpdateUser(User request)
+        {
+            _appDbContext.Update(request);
+            await _appDbContext.SaveChangesAsync();
+        }
+
+         public void Dispose()
         {
             _appDbContext.Dispose();
         }

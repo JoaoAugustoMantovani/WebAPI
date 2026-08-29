@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WebAPI.Models;
 using WebAPI.Repository;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using System.Security.Cryptography;
-using System.Net.Mail;
 using Microsoft.AspNetCore.Identity;
 
 namespace WebAPI.Service
@@ -14,23 +7,57 @@ namespace WebAPI.Service
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher)
         {
             _userRepository = userRepository;
+            _passwordHasher = passwordHasher;
         }
 
-        byte[] salt = RandomNumberGenerator.GetBytes(12888/8);
-
         public async Task<User> CreateUser(UserDTO user)
-        {   
-
-            // string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            //     password: 
-            // ));
-
-            var userModel = User.CreateUser(user.Email, user.Name, user.Idade, user.Senha);
+        {
+            var hashedPassword = _passwordHasher.HashPassword(new User(user.Email, user.Name, user.Senha, user.Idade), user.Senha);
+            var userModel = User.CreateUser(user.Email, user.Name, user.Idade, hashedPassword);
             return await _userRepository.CreateUser(userModel);
+        }
+
+        public async Task DeleteUser(Guid userId)
+        {
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new Exception("Usuário não encontrado");
+
+            await _userRepository.DeleteUser(user);
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _userRepository.GetAllUsers() ?? throw new Exception("Usuários não encontrados");
+        }
+
+        public async Task<User> GetUserById(Guid userId)
+        {
+            var user = await _userRepository.GetUserById(userId);
+
+            if (user == null)
+                throw new Exception("Usuário não encontrado");
+
+            return user;
+        }
+
+        public async Task<bool> UpdateUser(UserDTO request, Guid id)
+        {
+            var user = await _userRepository.GetUserById(id) ?? throw new Exception("Usuário não encontrado");
+           
+            var hashedPassword = _passwordHasher.HashPassword(
+                new User(request.Email, request.Name, request.Senha, request.Idade),
+                request.Senha);
+    
+            var updateModel = user.UpdateUser(request.Email, request.Name, request.Idade, hashedPassword);
+            await _userRepository.UpdateUser(updateModel);
+
+            return true;
         }
     }
 }

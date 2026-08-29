@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using WebAPI.Data;
+using WebAPI.Models;
 using WebAPI.Repository;
 using WebAPI.Service;
 
@@ -20,9 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     ))
 );
 
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddTransient<IPasswordHasher<User>,PasswordHasher<User>>();
 #endregion
 
 var app = builder.Build();

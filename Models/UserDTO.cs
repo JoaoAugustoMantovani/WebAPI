@@ -1,13 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 public record class UserDTO
 {
-    
     public string Email { get; set;}
     
-    
     public string Name { get; set;}
-    
     
     public string Senha { get; set; }
 
@@ -19,7 +14,5 @@ public record class UserDTO
         Name = name;
         Senha = senha;
         Idade = idade;
-
     }
-
 }
